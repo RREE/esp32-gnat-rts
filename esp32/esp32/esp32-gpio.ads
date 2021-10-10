@@ -7,9 +7,11 @@ package ESP32.GPIO is
    pragma Preelaborate;
    pragma Discard_Names;
 
-   type GPIO_Pad is range 0 .. 39;
+   type GPIO_Pad is range -1 .. 39;
    --  The ESP32 chip features 34 physical GPIO pads with numbers 0 .. 39
-   --  and some of numbers are reserved.
+   --  and some of numbers are reserved. (-1) indicates no pin change
+
+   Pin_No_Change : constant GPIO_Pad := -1;
 
    subtype Reserved_GPIO_Pad is GPIO_Pad
      with Static_Predicate =>
