@@ -380,17 +380,8 @@ package ESP32.UART is
 --   */
 --  esp_err_t uart_set_tx_idle_num(uart_port_t uart_num, uint16_t idle_num);
 
---  /**
---   * @brief Set UART configuration parameters.
---   *
---   * @param uart_num    UART port number, the max port number is (UART_NUM_MAX -1).
---   * @param uart_config UART parameter settings
---   *
---   * @return
---   *     - ESP_OK   Success
---   *     - ESP_FAIL Parameter error
---   */
---  esp_err_t uart_param_config(uart_port_t uart_num, const uart_config_t *uart_config);
+   --  Set UART configuration parameters.
+   procedure Param_Config (Port : Port_Num; Config : Uart_Config_t);
 
 --  /**
 --   * @brief Configure UART interrupts.

@@ -3,6 +3,7 @@
 --  SPDX-License-Identifier: MIT
 -------------------------------------------------------------
 
+with System;
 with Interfaces;
 with ESP32.UART_Types;
 
@@ -14,8 +15,18 @@ package body ESP32.UART is
                              Queue_Size : Natural;
                              -- QueueHandle_t* Uart_Queue;
                              Intr_Alloc_Flags : Unsigned_32)
-   is begin
-      null;
+   is
+      function uart_driver_install (Port             : Port_Num;
+                                    Rx_Buffer_Size   : Integer;
+                                    Tx_Buffer_Size   : Integer;
+                                    Queue_Size       : Integer;
+                                    Queue            : System.Address;
+                                    Intr_Alloc_Flags : Unsigned_32) return Integer;
+      pragma Import (C, uart_driver_install, "uart_driver_install");
+      Err : Integer;
+      Dummy_Address : System.Address;
+   begin
+      Err := uart_driver_install (Port, Rx_Buffer_Size, Tx_Buffer_Size, 0, Dummy_Address, Intr_Alloc_Flags);
    end Driver_Install;
 
 
@@ -24,7 +35,6 @@ package body ESP32.UART is
    is begin
       null;
    end Driver_Delete;
-
 
 
    --  Checks whether the driver is installed or not
@@ -292,8 +302,20 @@ package body ESP32.UART is
                       Rx_IO_Num  : GPIO_Pad := Pin_No_Change;
                       Rts_IO_Num : GPIO_Pad := Pin_No_Change;
                       Cts_IO_Num : GPIO_Pad := Pin_No_Change)
-   is begin
-      null;
+   is
+      function uart_set_pin (Uart_Num : Port_Num; Tx_Io_Num : Gpio_Pad; Rx_Io_Num : Gpio_Pad; Rts_Io_Num : Gpio_pad; Cts_Io_Num : Gpio_pad) return Integer;
+      pragma Import (C, uart_set_pin, "uart_set_pin");
+      Err : Integer;
+
+   begin
+      --  if Tx_Io_Num /= Pin_No_Change then
+      --     --  gpio_hal_iomux_func_sel(GPIO_PIN_MUX_REG[tx_io_num], PIN_FUNC_GPIO);
+      --     Gpio.Set_Level (Tx_Io_Num, True);
+      --     --  esp_rom_gpio_connect_out_signal(tx_io_num, uart_periph_signal[uart_num].tx_sig, 0, 0);
+
+      --  end if;
+
+      Err := uart_set_pin (Port, Tx_Io_Num, Rx_Io_Num, Rts_Io_Num, Cts_Io_Num);
    end Set_Pin;
 
 
@@ -335,17 +357,16 @@ package body ESP32.UART is
 --   */
 --  esp_err_t uart_set_tx_idle_num(uart_port_t uart_num, uint16_t idle_num);
 
---  /**
---   * @brief Set UART configuration parameters.
---   *
---   * @param uart_num    UART port number, the max port number is (UART_NUM_MAX -1).
---   * @param uart_config UART parameter settings
---   *
---   * @return
---   *     - ESP_OK   Success
---   *     - ESP_FAIL Parameter error
---   */
---  esp_err_t uart_param_config(uart_port_t uart_num, const uart_config_t *uart_config);
+
+   --  Set UART configuration parameters.
+   procedure Param_Config (Port : Port_Num; Config : Uart_Config_t)
+   is
+      procedure uart_param_config (Port : Port_Num; Uart_Config : Uart_Config_T);
+      pragma Import (C, uart_param_config, "uart_param_config");
+   begin
+      uart_param_config (Port, Config);
+   end Param_Config;
+
 
 --  /**
 --   * @brief Configure UART interrupts.
@@ -388,11 +409,14 @@ package body ESP32.UART is
 --   */
 --  int uart_tx_chars(uart_port_t uart_num, const char* buffer, uint32_t len);
 
---  /**
---   * @brief Send data to the UART port from a given buffer and length,
+   --  Send data to the UART port from a given buffer and length,
    procedure Write_Bytes (Port : Port_Num; Src : Uart_Data)
-   is begin
-      null;
+   is
+      function uart_write_bytes(Port: Port_Num; Src : System.Address; Size: Integer) return Integer;
+      pragma Import (C, Uart_Write_Bytes, "uart_write_bytes");
+      Err : Integer;
+   begin
+      Err := uart_write_bytes (Port, Src'Address, Src'Length);
    end Write_Bytes;
 
 

@@ -1,8 +1,11 @@
 -- #include "soc/soc_caps.h"
 
+with Interfaces;
 package ESP32.Uart_Types is
    pragma Pure;
    pragma Discard_Names;
+
+   use Interfaces;
 
    -- UART mode selection
    type Uart_Mode
@@ -118,9 +121,7 @@ package ESP32.Uart_Types is
 --      uint8_t xoff_thrd;       --!< If the software flow control is enabled and the data amount in rxfifo is more than xoff_thrd, an xoff_char will be sent*/
 --  } uart_sw_flowctrl_t;
 
---  --*
---   * @brief UART configuration parameters for uart_param_config function
---   */
+   -- UART configuration parameters for uart_param_config function
 --  typedef struct {
 --      int baud_rate;                      --!< UART baud rate*/
 --      uart_word_length_t data_bits;       --!< UART byte size*/
@@ -133,5 +134,14 @@ package ESP32.Uart_Types is
 --          bool use_ref_tick  __attribute__((deprecated)); --!< Deprecated method to select ref tick clock source, set source_clk field instead */
 --      };
 --  } uart_config_t;
+   type Uart_Config_T is record
+      Baud_Rate           : Natural;
+      Data_Bits           : Nr_Of_Data_Bits;
+      Parity              : Parity_Mode;
+      Stop_Bits           : Nr_Of_Stop_Bits;
+      Flow_Ctrl           : Hw_Flow_Control_T;
+      Rx_Flow_Ctrl_Thresh : Unsigned_8;
+      Source_Clk          : Source_Clock_T;
+   end record;
 
 end Esp32.Uart_Types;
